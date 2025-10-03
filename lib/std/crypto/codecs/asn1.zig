@@ -312,10 +312,7 @@ pub const BitString = struct {
     }
 
     pub fn encodeDer(self: BitString, encoder: *der.Encoder) !void {
-        try encoder.writer().writeAll(self.bytes);
-        try encoder.writer().writeByte(self.right_padding);
-        try encoder.length(self.bytes.len + 1);
-        try encoder.tag(asn1_tag);
+        try encoder.tagVec(asn1_tag, &.{ self.bytes, &.{self.right_padding} });
     }
 };
 

@@ -116,8 +116,15 @@ pub fn tagBytes(self: *Encoder, tag_: Tag, bytes: []const u8) !void {
     try self.tag(tag_);
 }
 
-/// Warning: This writer writes backwards. `fn print` will NOT work as expected.
-pub fn writer(self: *Encoder) *std.Io.Writer {
+/// Encode a tag and a length-prefixed vector of bytes.
+pub fn tagVec(self: *Encoder, tag_: Tag, data: []const []const u8) !void {
+    for (data) |bytes| try self.buffer.prependSlice(bytes);
+    try self.length(std.Io.Writer.countSplat(data, 1));
+    try self.tag(tag_);
+}
+
+// Warning: This writer writes backwards. `fn print` will NOT work as expected.
+fn writer(self: *Encoder) *std.Io.Writer {
     return &self.buffer.writer;
 }
 
